@@ -7,6 +7,6 @@
         public int ArtistId { get; set; }
         public Artist Artist { get; set; }
         public string Album { get; set; }
-        public DateTime length { get; set; }
+        public TimeSpan Length { get; set; }
     }
 }
