@@ -16,7 +16,7 @@ public class TunaPianoDbContext : DbContext
     }
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
-        // seed data with campsite types
+        
         modelBuilder.Entity<Artist>().HasData(new Artist[]
         {
             new Artist {Id = 1, Name = "Sevendust", Age = 30, Bio = "Long running metal band"},
