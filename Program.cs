@@ -56,7 +56,7 @@ app.MapGet("/api/songs", (TunaPianoDbContext db) =>
 
 app.MapGet("/api/songs/{id}", (TunaPianoDbContext db, int id) =>
 {
-    return db.Songs.Include(s => s.Artist).Single(s => s.Id == id);
+    return db.Songs.Include(s => s.Artist).Include(s => s.Genre).Single(s => s.Id == id);
 });
 
 app.MapDelete("/api/songs/{id}", (TunaPianoDbContext db, int id) =>
@@ -85,7 +85,7 @@ app.MapPut("/api/songs/{id}", (TunaPianoDbContext db, int id, Song song) =>
     songToUpdate.Length = song.Length;
 
     db.SaveChanges();
-    return Results.NoContent();
+    return Results.Ok(songToUpdate);
 });
 
 app.MapPost("/api/songs", (TunaPianoDbContext db, Song song) =>
@@ -104,7 +104,7 @@ app.MapGet("/api/artists", (TunaPianoDbContext db) =>
 
 app.MapGet("/api/artists/{id}", (TunaPianoDbContext db, int id) =>
 {
-    return db.Artists.Include(a => a.Id == id);
+    return db.Artists.Include(a => a.Songs).Single(a => a.Id == id);
 });
 
 app.MapDelete("/api/artists/{id}", (TunaPianoDbContext db, int id) =>
@@ -151,7 +151,7 @@ app.MapGet("/api/genres", (TunaPianoDbContext db) =>
 
 app.MapGet("/api/genres/{id}", (TunaPianoDbContext db, int id) =>
 {
-    return db.Genres.Include(g => g.Id == id);
+    return db.Genres.Include(g => g.Songs).Single(g => g.Id == id);
 });
 
 app.MapPost("/api/genres", (TunaPianoDbContext db, Genre genre) =>
