@@ -26,36 +26,16 @@ namespace Tuna_Piano_API.Migrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "SongGenres",
-                columns: table => new
-                {
-                    Id = table.Column<int>(type: "integer", nullable: false)
-                        .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
-                    SongId = table.Column<int>(type: "integer", nullable: false),
-                    GenreId = table.Column<int>(type: "integer", nullable: false)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_SongGenres", x => x.Id);
-                });
-
-            migrationBuilder.CreateTable(
                 name: "Genres",
                 columns: table => new
                 {
                     Id = table.Column<int>(type: "integer", nullable: false)
                         .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
-                    Description = table.Column<string>(type: "text", nullable: false),
-                    SongGenreId = table.Column<int>(type: "integer", nullable: true)
+                    Description = table.Column<string>(type: "text", nullable: false)
                 },
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_Genres", x => x.Id);
-                    table.ForeignKey(
-                        name: "FK_Genres_SongGenres_SongGenreId",
-                        column: x => x.SongGenreId,
-                        principalTable: "SongGenres",
-                        principalColumn: "Id");
                 });
 
             migrationBuilder.CreateTable(
@@ -67,23 +47,59 @@ namespace Tuna_Piano_API.Migrations
                     Title = table.Column<string>(type: "text", nullable: false),
                     ArtistId = table.Column<int>(type: "integer", nullable: false),
                     Album = table.Column<string>(type: "text", nullable: false),
-                    Length = table.Column<TimeSpan>(type: "interval", nullable: false),
-                    SongGenreId = table.Column<int>(type: "integer", nullable: true)
+                    Length = table.Column<TimeSpan>(type: "interval", nullable: false)
                 },
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_Songs", x => x.Id);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "ArtistSong",
+                columns: table => new
+                {
+                    ArtistId = table.Column<int>(type: "integer", nullable: false),
+                    SongsId = table.Column<int>(type: "integer", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_ArtistSong", x => new { x.ArtistId, x.SongsId });
                     table.ForeignKey(
-                        name: "FK_Songs_Artists_ArtistId",
+                        name: "FK_ArtistSong_Artists_ArtistId",
                         column: x => x.ArtistId,
                         principalTable: "Artists",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
                     table.ForeignKey(
-                        name: "FK_Songs_SongGenres_SongGenreId",
-                        column: x => x.SongGenreId,
-                        principalTable: "SongGenres",
-                        principalColumn: "Id");
+                        name: "FK_ArtistSong_Songs_SongsId",
+                        column: x => x.SongsId,
+                        principalTable: "Songs",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "GenreSong",
+                columns: table => new
+                {
+                    GenreId = table.Column<int>(type: "integer", nullable: false),
+                    SongId = table.Column<int>(type: "integer", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_GenreSong", x => new { x.GenreId, x.SongId });
+                    table.ForeignKey(
+                        name: "FK_GenreSong_Genres_GenreId",
+                        column: x => x.GenreId,
+                        principalTable: "Genres",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                    table.ForeignKey(
+                        name: "FK_GenreSong_Songs_SongId",
+                        column: x => x.SongId,
+                        principalTable: "Songs",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
                 });
 
             migrationBuilder.InsertData(
@@ -98,62 +114,50 @@ namespace Tuna_Piano_API.Migrations
 
             migrationBuilder.InsertData(
                 table: "Genres",
-                columns: new[] { "Id", "Description", "SongGenreId" },
+                columns: new[] { "Id", "Description" },
                 values: new object[,]
                 {
-                    { 1, "Metal", null },
-                    { 2, "Rock", null }
-                });
-
-            migrationBuilder.InsertData(
-                table: "SongGenres",
-                columns: new[] { "Id", "GenreId", "SongId" },
-                values: new object[,]
-                {
-                    { 1, 1, 1 },
-                    { 2, 2, 2 },
-                    { 3, 1, 3 }
+                    { 1, "Metal" },
+                    { 2, "Rock" }
                 });
 
             migrationBuilder.InsertData(
                 table: "Songs",
-                columns: new[] { "Id", "Album", "ArtistId", "Length", "SongGenreId", "Title" },
+                columns: new[] { "Id", "Album", "ArtistId", "Length", "Title" },
                 values: new object[,]
                 {
-                    { 1, "Seasons", 1, new TimeSpan(0, 0, 3, 30, 0), null, "Broken Down" },
-                    { 2, "Hoobastank", 2, new TimeSpan(0, 0, 2, 55, 0), null, "Crawling in the Dark" },
-                    { 3, "Break the Cycle", 3, new TimeSpan(0, 0, 3, 20, 0), null, "Fade" }
+                    { 1, "Seasons", 1, new TimeSpan(0, 0, 3, 30, 0), "Broken Down" },
+                    { 2, "Hoobastank", 2, new TimeSpan(0, 0, 2, 55, 0), "Crawling in the Dark" },
+                    { 3, "Break the Cycle", 3, new TimeSpan(0, 0, 3, 20, 0), "Fade" }
                 });
 
             migrationBuilder.CreateIndex(
-                name: "IX_Genres_SongGenreId",
-                table: "Genres",
-                column: "SongGenreId");
+                name: "IX_ArtistSong_SongsId",
+                table: "ArtistSong",
+                column: "SongsId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_Songs_ArtistId",
-                table: "Songs",
-                column: "ArtistId");
-
-            migrationBuilder.CreateIndex(
-                name: "IX_Songs_SongGenreId",
-                table: "Songs",
-                column: "SongGenreId");
+                name: "IX_GenreSong_SongId",
+                table: "GenreSong",
+                column: "SongId");
         }
 
         protected override void Down(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.DropTable(
-                name: "Genres");
+                name: "ArtistSong");
 
             migrationBuilder.DropTable(
-                name: "Songs");
+                name: "GenreSong");
 
             migrationBuilder.DropTable(
                 name: "Artists");
 
             migrationBuilder.DropTable(
-                name: "SongGenres");
+                name: "Genres");
+
+            migrationBuilder.DropTable(
+                name: "Songs");
         }
     }
 }

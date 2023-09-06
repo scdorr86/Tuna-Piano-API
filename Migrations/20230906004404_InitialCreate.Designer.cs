@@ -2,6 +2,7 @@
 using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
@@ -10,9 +11,10 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace Tuna_Piano_API.Migrations
 {
     [DbContext(typeof(TunaPianoDbContext))]
-    partial class TunaPianoDbContextModelSnapshot : ModelSnapshot
+    [Migration("20230906004404_InitialCreate")]
+    partial class InitialCreate
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -20,6 +22,36 @@ namespace Tuna_Piano_API.Migrations
                 .HasAnnotation("Relational:MaxIdentifierLength", 63);
 
             NpgsqlModelBuilderExtensions.UseIdentityByDefaultColumns(modelBuilder);
+
+            modelBuilder.Entity("ArtistSong", b =>
+                {
+                    b.Property<int>("ArtistId")
+                        .HasColumnType("integer");
+
+                    b.Property<int>("SongsId")
+                        .HasColumnType("integer");
+
+                    b.HasKey("ArtistId", "SongsId");
+
+                    b.HasIndex("SongsId");
+
+                    b.ToTable("ArtistSong");
+                });
+
+            modelBuilder.Entity("GenreSong", b =>
+                {
+                    b.Property<int>("GenreId")
+                        .HasColumnType("integer");
+
+                    b.Property<int>("SongId")
+                        .HasColumnType("integer");
+
+                    b.HasKey("GenreId", "SongId");
+
+                    b.HasIndex("SongId");
+
+                    b.ToTable("GenreSong");
+                });
 
             modelBuilder.Entity("Tuna_Piano_API.Models.Artist", b =>
                 {
@@ -112,9 +144,6 @@ namespace Tuna_Piano_API.Migrations
                     b.Property<int>("ArtistId")
                         .HasColumnType("integer");
 
-                    b.Property<int>("GenreId")
-                        .HasColumnType("integer");
-
                     b.Property<TimeSpan>("Length")
                         .HasColumnType("interval");
 
@@ -124,10 +153,6 @@ namespace Tuna_Piano_API.Migrations
 
                     b.HasKey("Id");
 
-                    b.HasIndex("ArtistId");
-
-                    b.HasIndex("GenreId");
-
                     b.ToTable("Songs");
 
                     b.HasData(
@@ -136,7 +161,6 @@ namespace Tuna_Piano_API.Migrations
                             Id = 1,
                             Album = "Seasons",
                             ArtistId = 1,
-                            GenreId = 2,
                             Length = new TimeSpan(0, 0, 3, 30, 0),
                             Title = "Broken Down"
                         },
@@ -145,7 +169,6 @@ namespace Tuna_Piano_API.Migrations
                             Id = 2,
                             Album = "Hoobastank",
                             ArtistId = 2,
-                            GenreId = 2,
                             Length = new TimeSpan(0, 0, 2, 55, 0),
                             Title = "Crawling in the Dark"
                         },
@@ -154,39 +177,39 @@ namespace Tuna_Piano_API.Migrations
                             Id = 3,
                             Album = "Break the Cycle",
                             ArtistId = 3,
-                            GenreId = 1,
                             Length = new TimeSpan(0, 0, 3, 20, 0),
                             Title = "Fade"
                         });
                 });
 
-            modelBuilder.Entity("Tuna_Piano_API.Models.Song", b =>
+            modelBuilder.Entity("ArtistSong", b =>
                 {
-                    b.HasOne("Tuna_Piano_API.Models.Artist", "Artist")
-                        .WithMany("Songs")
+                    b.HasOne("Tuna_Piano_API.Models.Artist", null)
+                        .WithMany()
                         .HasForeignKey("ArtistId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("Tuna_Piano_API.Models.Genre", "Genre")
-                        .WithMany("Songs")
+                    b.HasOne("Tuna_Piano_API.Models.Song", null)
+                        .WithMany()
+                        .HasForeignKey("SongsId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+                });
+
+            modelBuilder.Entity("GenreSong", b =>
+                {
+                    b.HasOne("Tuna_Piano_API.Models.Genre", null)
+                        .WithMany()
                         .HasForeignKey("GenreId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.Navigation("Artist");
-
-                    b.Navigation("Genre");
-                });
-
-            modelBuilder.Entity("Tuna_Piano_API.Models.Artist", b =>
-                {
-                    b.Navigation("Songs");
-                });
-
-            modelBuilder.Entity("Tuna_Piano_API.Models.Genre", b =>
-                {
-                    b.Navigation("Songs");
+                    b.HasOne("Tuna_Piano_API.Models.Song", null)
+                        .WithMany()
+                        .HasForeignKey("SongId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
                 });
 #pragma warning restore 612, 618
         }
